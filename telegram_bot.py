@@ -7,11 +7,14 @@ from telegram.ext import Updater, MessageHandler, Filters, CallbackContext, Comm
 
 logger = logging.getLogger(__name__)
 
+
 def detect_intent_texts(project_id, session_id, texts, language_code):
-    """Возвращает результат обнаружения намерений с текстами в качестве входных данных.
+    """
+    Возвращает результат обнаружения намерений с текстами в качестве входных данных.
 
     Использование одного и того же `session_id` между запросами позволяет продолжать
-    разговор."""
+    разговор.
+    """
 
     session_client = dialogflow.SessionsClient()
     session = session_client.session_path(project_id, session_id)
@@ -27,6 +30,7 @@ def detect_intent_texts(project_id, session_id, texts, language_code):
 
         return response.query_result.fulfillment_text
 
+
 def send_message(bot, chat_id, message):
     bot.send_message(chat_id=chat_id, text=message)
 
@@ -36,7 +40,7 @@ def echo(update: Update, context: CallbackContext) -> None:
     project_id = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
     session_id = str(update.message.chat_id)
     language_code = "ru"
-    
+
     response = detect_intent_texts(project_id, session_id, [user_text], language_code)
 
     send_message(context.bot, update.message.chat_id, response)
@@ -52,6 +56,7 @@ class TelegramLogsHandler(logging.Handler):
     def emit(self, record):
         log_entry = self.format(record)
         self.bot.send_message(chat_id=self.tg_chat_id, text=log_entry)
+
 
 def start(update, context):
     update.message.reply_text('Привет! Я бот, который умеет общаться с Dialogflow!')
