@@ -1,33 +1,29 @@
 import os
 from dotenv import load_dotenv
-import vk_api
+import vk_api as vk
 from vk_api.longpoll import VkLongPoll, VkEventType
 import random
+
+
+def echo(event, vk_api):
+    vk_api.messages.send(
+        user_id=event.user_id,
+        message=f'Вы отправили мне сообщение с текстом: "{event.text}"',
+        random_id=random.randint(1, 1000)
+    )
 
 
 def main():
     load_dotenv()
     vk_key_api = os.getenv('VK_KEY_API')
-    vk_session = vk_api.VkApi(token=vk_key_api)
-    vk = vk_session.get_api()
+    vk_session = vk.VkApi(token=vk_key_api)
+    vk_api = vk_session.get_api()
 
     longpoll = VkLongPoll(vk_session)
 
     for event in longpoll.listen():
-        if event.type == VkEventType.MESSAGE_NEW:
-            print('Новое сообщение:')
-            if event.to_me:
-                print('Для меня от: ', event.user_id)
-            else:
-                print('От меня для: ', event.user_id)
-            print('Текст:', event.text)
-
-            # # Отправка ответа
-            # vk.messages.send(
-            #     peer_id=event.peer_id,
-            #     message=f'Ваше сообщение {event.text} получено!',
-            #     random_id=random.randint(1, 1e6)
-            # )
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            echo(event, vk_api)
 
 
 if __name__ == '__main__':
