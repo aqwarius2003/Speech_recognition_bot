@@ -1,5 +1,6 @@
 import os
 import logging
+
 from dotenv import load_dotenv
 from google.cloud import dialogflow
 from telegram import Bot, Update, ForceReply
@@ -35,13 +36,28 @@ def send_message(bot, chat_id, message):
     bot.send_message(chat_id=chat_id, text=message)
 
 
-def echo(update: Update, context: CallbackContext) -> None:
+def respond_to_message(update: Update, context: CallbackContext) -> None:
+    """
+        Обрабатывает текстовые сообщения от пользователей и отправляет ответ от Dialogflow.
+
+        Параметры:
+
+        update (Update): Объект, содержащий информацию о входящем обновлении от Telegram.
+
+        context (CallbackContext): Контекст, предоставляющий доступ к боту и другим данным.
+
+        Функция извлекает текст сообщения пользователя, отправляет его в Dialogflow для
+        определения намерения и получает ответ. Затем отправляет полученный ответ обратно
+        пользователю в Telegram.
+    """
+
     user_text = update.message.text
     project_id = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
     session_id = str(update.message.chat_id)
     language_code = "ru"
 
     response = detect_intent_texts(project_id, session_id, [user_text], language_code)
+
 
     send_message(context.bot, update.message.chat_id, response)
 
@@ -78,7 +94,7 @@ def main():
         dispatcher = updater.dispatcher
 
         dispatcher.add_handler(CommandHandler('start', start))
-        dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+        dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, respond_to_message))
         updater.start_polling()
         updater.idle()
     except Exception as e:

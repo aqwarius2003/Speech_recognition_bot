@@ -1,10 +1,11 @@
 import os
+import random
+import logging
+
 from dotenv import load_dotenv
 import vk_api as vk
 from vk_api.longpoll import VkLongPoll, VkEventType
 from google.cloud import dialogflow
-import random
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,6 @@ def detect_intent_texts(project_id, session_id, texts, language_code):
         return response.query_result.fulfillment_text
 
 
-
 def send_message(event, vk_api, message):
     """
         Отправляет сообщение пользователю через VK API.
@@ -52,7 +52,6 @@ def send_message(event, vk_api, message):
         message=message,
         random_id=random.randint(1, 1000)
     )
-
 
 
 def main():
@@ -85,5 +84,7 @@ def main():
 
             except Exception as e:
                 logger.error(f'Ошибка при обработке сообщения от пользователя {event.user_id}: {e}')
+
+
 if __name__ == '__main__':
     main()
