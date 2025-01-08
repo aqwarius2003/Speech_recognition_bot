@@ -27,8 +27,12 @@ def detect_intent_texts(project_id, session_id, texts, language_code):
         response = session_client.detect_intent(
             request={"session": session, "query_input": query_input}
         )
-
+        if response.query_result.intent.is_fallback:
+            logger.info(f'Обнаружен запасной вариант для текста: "{text}"')
+            return None
         return response.query_result.fulfillment_text
+
+
 
 def send_message(event, vk_api, message):
     """
@@ -43,18 +47,23 @@ def send_message(event, vk_api, message):
         message (str): текст сообщения для отправки.
     """
 
-    try:
-        vk_api.messages.send(
-            user_id=event.user_id,
-            message=message,
-            random_id=random.randint(1, 1000)
-        )
-    except Exception as e:
-        logger.error(f'Ошибка при отправке пользователю {event.user_id} сообщения: {e}')
+    vk_api.messages.send(
+        user_id=event.user_id,
+        message=message,
+        random_id=random.randint(1, 1000)
+    )
 
 
 
 def main():
+    logging.basicConfig(
+        level=logging.INFO,  # Устанавливаем уровень логирования
+        format="%(asctime)s %(levelname)s %(message)s",
+        handlers=[logging.StreamHandler()]  # Добавляем StreamHandler
+    )
+
+    logger.info('Бот для ВК запущен')
+
     load_dotenv()
     project_id = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
     vk_key_api = os.getenv('VK_KEY_API')
@@ -65,11 +74,16 @@ def main():
 
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            session_id = str(event.user_id)
-            language_code = "ru"
-            respond = detect_intent_texts(project_id, session_id, [event.text], language_code)
-            send_message(event, vk_api, respond)
+            try:
+                session_id = str(event.user_id)
+                language_code = "ru"
+                respond = detect_intent_texts(project_id, session_id, [event.text], language_code)
+                if respond:
+                    send_message(event, vk_api, respond)
+                else:
+                    logger.info(f'Бот не понял сообщение от пользователя {event.user_id} и смолчал)')
 
-
+            except Exception as e:
+                logger.error(f'Ошибка при обработке сообщения от пользователя {event.user_id}: {e}')
 if __name__ == '__main__':
     main()
