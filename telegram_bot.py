@@ -36,7 +36,7 @@ def send_message(bot, chat_id, message):
     bot.send_message(chat_id=chat_id, text=message)
 
 
-def respond_to_message(update: Update, context: CallbackContext) -> None:
+def respond_to_message(update: Update, context: CallbackContext, project_id, language_code: str) -> None:
     """
         Обрабатывает текстовые сообщения от пользователей и отправляет ответ от Dialogflow.
 
@@ -52,12 +52,9 @@ def respond_to_message(update: Update, context: CallbackContext) -> None:
     """
 
     user_text = update.message.text
-    project_id = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
     session_id = str(update.message.chat_id)
-    language_code = "ru"
 
     response = detect_intent_texts(project_id, session_id, [user_text], language_code)
-
 
     send_message(context.bot, update.message.chat_id, response)
 
@@ -83,6 +80,7 @@ def main():
     project_id = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
     tg_chat_id = os.getenv('TG_CHAT_ID')
     tg_bot_token = os.getenv('TG_BOT_TOKEN')
+    language_code = "ru"
 
     logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s")
     logger.setLevel(logging.INFO)
@@ -94,7 +92,16 @@ def main():
         dispatcher = updater.dispatcher
 
         dispatcher.add_handler(CommandHandler('start', start))
-        dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, respond_to_message))
+
+        dispatcher.add_handler(
+            MessageHandler(
+                Filters.text & ~Filters.command,
+                lambda update, context: respond_to_message(
+                    update, context, project_id, language_code
+                )
+            )
+        )
+
         updater.start_polling()
         updater.idle()
     except Exception as e:
