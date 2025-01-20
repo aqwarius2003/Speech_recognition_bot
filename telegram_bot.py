@@ -52,7 +52,8 @@ def respond_to_message(update: Update, context: CallbackContext, project_id, lan
     """
 
     user_text = update.message.text
-    session_id = update.message.chat_id
+    # Используем префикс для уникальности session_id
+    session_id = f'tg-{update.message.chat_id}'
 
     response = detect_intent_texts(project_id, session_id, [user_text], language_code)
 
