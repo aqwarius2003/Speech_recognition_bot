@@ -74,7 +74,7 @@ def main():
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
             try:
-                session_id = str(event.user_id)
+                session_id = event.user_id
                 language_code = "ru"
                 respond = detect_intent_texts(project_id, session_id, [event.text], language_code)
                 if respond:

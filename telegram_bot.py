@@ -52,7 +52,7 @@ def respond_to_message(update: Update, context: CallbackContext, project_id, lan
     """
 
     user_text = update.message.text
-    session_id = str(update.message.chat_id)
+    session_id = update.message.chat_id
 
     response = detect_intent_texts(project_id, session_id, [user_text], language_code)
 
