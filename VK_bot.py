@@ -62,10 +62,13 @@ def main():
     )
 
     logger.info('Бот для ВК запущен')
-
     load_dotenv()
-    project_id = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
-    vk_key_api = os.getenv('VK_KEY_API')
+    try:
+        project_id = os.environ['GOOGLE_CLOUD_PROJECT_ID']
+        vk_key_api = os.environ['VK_KEY_API']
+    except KeyError as error:
+        logger.error(f'Переменные окружения не найдены. Ошибка {error}')
+
     vk_session = vk.VkApi(token=vk_key_api)
     vk_api = vk_session.get_api()
 

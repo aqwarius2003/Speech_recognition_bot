@@ -78,9 +78,12 @@ def start(update, context):
 
 def main():
     load_dotenv()
-    project_id = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
-    tg_chat_id = os.getenv('TG_CHAT_ID')
-    tg_bot_token = os.getenv('TG_BOT_TOKEN')
+    try:
+        project_id = os.environ['GOOGLE_CLOUD_PROJECT_ID']
+        tg_chat_id = os.environ['TG_CHAT_ID']
+        tg_bot_token = os.environ['TG_BOT_TOKEN']
+    except KeyError as error:
+        logger.error(f'Переменные окружения не найдены. Ошибка: {error}')
     language_code = "ru"
 
     logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s")
