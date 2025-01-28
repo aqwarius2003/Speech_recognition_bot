@@ -5,9 +5,6 @@
 |![Support_bot](https://github.com/user-attachments/assets/78660d91-d895-41aa-8738-673cdc16114a)| Ссылки на запущеных ботов <br> ► [VK_bot](https://vk.com/im/convo/-227165703?entrypoint=profile_page) <br> ► [TG_bot](https://t.me/VttPrivateBot) |
 |-------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
 
-### Ссылки запущеных на ботов
-[VK_bot](https://vk.com/im/convo/-227165703?entrypoint=profile_page)
-[TG_bot](https://t.me/VttPrivateBot)
 
 ## Структура проекта
 
